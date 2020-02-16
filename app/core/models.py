@@ -4,6 +4,18 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, \
 
 from django.conf import settings
 
+import uuid
+import os
+
+
+def recipe_image_file_path(instance, filename):
+    """Generate file path for new recipe image"""
+    ext = filename.split('.')[-1]  # get extension
+    filename = f'{uuid.uuid4()}.{ext}'
+
+    return os.path.join('uploads/recipe/', filename)
+
+
 
 class UserManager(BaseUserManager):
 
@@ -73,6 +85,8 @@ class Recipe(models.Model):
     link = models.CharField(max_length=255, blank=True)  # blank=True means the link will be optional
     ingredients = models.ManyToManyField('Ingredient')
     tags = models.ManyToManyField('Tag')
+    image = models.ImageField(null=True, upload_to=recipe_image_file_path)
+    # recipe_image_file_path is called in the background by django
 
     def __str__(self):
         return self.title
